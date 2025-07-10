@@ -10,7 +10,7 @@ livePreviewConfiguration:
   setupCommand: ":"
 siteStream:
   id: site-stream
-  entityId: entity-id
+  entityId: hybridSite
   fields:
     - favicon
     - logo
@@ -27,6 +27,8 @@ siteStream:
   localization:
     locales:
       - en
+      - es
+      - fr
 # authentication:
 #   policyName: auth-policy
 #   includePaths:
