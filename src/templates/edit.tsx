@@ -27,7 +27,7 @@ const componentRegistry: Record<string, Config<any>> = {
   main: mainConfig,
   directory: directoryConfig,
   locator: locatorConfig,
-  repoLocation: mainConfig,
+  "repo-based-location": mainConfig,
 };
 
 // Editor is available at /edit

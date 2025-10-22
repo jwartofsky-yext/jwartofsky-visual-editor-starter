@@ -29,7 +29,7 @@ import {
 import { AnalyticsProvider, SchemaWrapper } from "@yext/pages-components";
 
 export const config = {
-  name: "repoLocation",
+  name: "repo-based-location",
   stream: {
     $id: "repo-location-stream",
     filter: {
