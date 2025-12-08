@@ -9,8 +9,9 @@ import {
   HeadConfig,
   TagType,
   TemplateConfig,
+  TransformProps,
 } from "@yext/pages";
-import { Render } from "@measured/puck";
+import { Data, Render, resolveAllData } from "@measured/puck";
 import {
   applyTheme,
   VisualEditorProvider,
@@ -20,7 +21,7 @@ import {
   migrate,
   migrationRegistry,
   filterComponentsFromConfig,
-  resolveUrlTemplate,
+  resolvePageSetUrlTemplate,
   defaultThemeConfig,
   mainConfig,
   getSchema,
@@ -61,7 +62,7 @@ export const getHeadConfig: GetHeadConfig<TemplateRenderProps> = (
 ): HeadConfig => {
   const { document } = data;
   const { title, description } = getPageMetadata(document);
-  const schema = getSchema(document);
+  const schema = getSchema(data);
   const faviconUrl = document?._favicon ?? document?._site?.favicon?.url;
 
   return {
@@ -70,7 +71,7 @@ export const getHeadConfig: GetHeadConfig<TemplateRenderProps> = (
     viewport: "width=device-width, initial-scale=1",
     tags: [
       {
-        type: "link",
+        type: "link" as TagType,
         attributes: {
           rel: "icon",
           type: "image/x-icon",
@@ -120,15 +121,33 @@ export const getHeadConfig: GetHeadConfig<TemplateRenderProps> = (
   };
 };
 
-export const getPath: GetPath<TemplateProps> = ({
-  document,
-  relativePrefixToRoot,
-}) => {
-  return "repo-based/" + resolveUrlTemplate(document, relativePrefixToRoot);
+export const getPath: GetPath<
+  TemplateProps & { relativePrefixToRoot: string }
+> = ({ document, relativePrefixToRoot }) => {
+  return (
+    "repo-based/" + resolvePageSetUrlTemplate(document, relativePrefixToRoot)
+  );
 };
 
-const RepoLocation: Template<TemplateRenderProps> = (props) => {
+export const transformProps: TransformProps<TemplateProps> = async (props) => {
   const { document } = props;
+  const migratedData = migrate(
+    JSON.parse(document.__.layout),
+    migrationRegistry,
+    mainConfig,
+    document
+  );
+  const updatedData = await resolveAllData(migratedData, mainConfig, {
+    streamDocument: document,
+  });
+
+  return { ...props, data: updatedData };
+};
+
+const RepoLocation: Template<TemplateRenderProps & { data: Data }> = (
+  props
+) => {
+  const { document, data } = props;
   const filteredConfig = filterComponentsFromConfig(
     mainConfig,
     document?._additionalLayoutComponents,
@@ -144,11 +163,8 @@ const RepoLocation: Template<TemplateRenderProps> = (props) => {
       <VisualEditorProvider templateProps={props}>
         <Render
           config={filteredConfig}
-          data={migrate(
-            JSON.parse(document.__.layout),
-            migrationRegistry,
-            filteredConfig
-          )}
+          data={data}
+          metadata={{ streamDocument: document }}
         />
       </VisualEditorProvider>
     </AnalyticsProvider>
