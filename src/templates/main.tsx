@@ -32,6 +32,7 @@ import { AnalyticsProvider, SchemaWrapper } from "@yext/pages-components";
 export const getHeadConfig: GetHeadConfig<TemplateRenderProps> = (
   data: TemplateRenderProps
 ): HeadConfig => {
+  console.log("getHeadConfig data:", data);
   const { document } = data;
   const { title, description } = getPageMetadata(document);
   const schema = getSchema(data);
@@ -115,6 +116,7 @@ export const transformProps: TransformProps<TemplateProps> = async (props) => {
 };
 
 const Location: Template<TemplateRenderProps & { data: Data }> = (props) => {
+  console.log("main template props:", props);
   const { document, data } = props;
   const filteredConfig = filterComponentsFromConfig(
     mainConfig,

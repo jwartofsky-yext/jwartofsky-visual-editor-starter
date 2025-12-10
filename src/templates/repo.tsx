@@ -51,6 +51,8 @@ export const config = {
     localization: {
       locales: ["en", "es"],
     },
+    // @ts-expect-error pending pages update
+    includeCertifiedFacts: true,
   },
   additionalProperties: {
     isVETemplate: true,
